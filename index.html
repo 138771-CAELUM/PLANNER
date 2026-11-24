@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE PLANNER OF DOOM</title>
+
+
+<style>
+  :root {
+    --bg: #f4f5fa;
+    --panel: #ffffff;
+    --text: #1f2430;
+    --muted: #697386;
+    --border: #e4e7ee;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --green: #16a34a;
+    --amber: #d97706;
+    --red: #dc2626;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 18px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 750; font-size: 20px; }
+
+  .logo {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    display: grid; place-items: center;
+    font-size: 19px;
+  }
+
+  .subtitle { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn {
+    border: 1px solid transparent;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-weight: 650;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #4338ca; }
+
+  .btn-ghost { background: white; border-color: var(--border); color: var(--text); }
+  .btn-ghost:hover { border-color: #c9d0dd; }
+
+  main { padding: 22px 26px 60px; }
+
+  .mode-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .mode-text { font-size: 14px; font-weight: 650; }
+  .mode-sub { color: var(--muted); font-size: 13px; margin-top: 3px; }
+
+  .mode-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .mode-btn {
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-weight: 650;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .mode-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .ideas {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .ideas h2 { margin: 0 0 10px; font-size: 16px; }
+  .idea-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .idea {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid #dfe3ff;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+  }
+
+  .idea:hover { background: #e2e7ff; }
+
+  .week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(235px, 1fr));
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+
+  .day {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    min-height: 460px;
+  }
+
+  .day-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .day-name { font-weight: 750; }
+
+  .day-count {
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .slot {
+    border: 1px dashed #d8dde8;
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    min-height: 58px;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .slot:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #fbfbff;
+  }
+
+  .slot.filled {
+    border: 1px solid var(--border);
+    background: #fcfcfe;
+    color: var(--text);
+    cursor: default;
+  }
+
+  .slot-time { font-weight: 700; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .slot-title { font-weight: 650; font-size: 13px; line-height: 1.3; }
+  .slot-owner { margin-top: 4px; font-size: 11px; color: var(--muted); }
+
+  .task-actions { display: flex; gap: 6px; margin-top: 7px; }
+
+  .mini {
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 650;
+    padding: 3px 7px;
+    cursor: pointer;
+  }
+
+  .mini:hover { color: var(--text); border-color: #c9d0dd; }
+  .mini.danger:hover { color: var(--red); border-color: #f3c1c1; }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 50;
+  }
+
+  .overlay.show { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 18px;
+    width: min(540px, 100%);
+    max-height: 92vh;
+    overflow: auto;
+    padding: 24px;
+  }
+
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal h2 { margin: 0; font-size: 20px; }
+  .close { border: none; background: none; font-size: 22px; color: var(--muted); cursor: pointer; }
+
+  .field { margin-bottom: 13px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    color: #4b5565;
+    margin-bottom: 6px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font: inherit;
+    background: #fbfbfd;
+    color: var(--text);
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+  @media (max-width: 900px) {
+    .week { grid-template-columns: repeat(7, 250px); }
+    main, header { padding-left: 16px; padding-right: 16px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="logo">D</div>
+    <div>
+      THE PLANNER OF DOOM
+      <div class="subtitle">One week. Seven days. Infinite doom.</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="openModal()">+ New task</button>
+  </div>
+</header>
+
+<main>
+  <div class="mode-bar">
+    <div>
+      <div class="mode-text" id="modeTitle">Offline mode</div>
+      <div class="mode-sub" id="modeText">Tasks are saved only on this device. Other people cannot edit them.</div>
+    </div>
+
+    <div class="mode-buttons">
+      <button class="mode-btn active" id="offlineBtn" onclick="setMode('offline')">Offline</button>
+      <button class="mode-btn" id="sharedBtn" onclick="setMode('shared')">Shared</button>
+    </div>
+  </div>
+
+  <section class="ideas">
+    <h2>Need an idea for what to do?</h2>
+    <div class="idea-row">
+      <button class="idea" onclick="useIdea('Study for 30 minutes')">Study for 30 minutes</button>
+      <button class="idea" onclick="useIdea('Do homework')">Do homework</button>
+      <button class="idea" onclick="useIdea('Clean my room')">Clean my room</button>
+      <button class="idea" onclick="useIdea('Go for a walk')">Go for a walk</button>
+      <button class="idea" onclick="useIdea('Read 10 pages')">Read 10 pages</button>
+      <button class="idea" onclick="useIdea('Practice a skill')">Practice a skill</button>
+      <button class="idea" onclick="useIdea('Prepare for tomorrow')">Prepare for tomorrow</button>
+      <button class="idea" onclick="useIdea('Call family or a friend')">Call family or a friend</button>
+      <button class="idea" onclick="useIdea('Take a break and drink water')">Take a break and drink water</button>
+    </div>
+  </section>
+
+  <div class="week" id="week"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">New task</h2>
+      <button class="close" onclick="closeModal()">&times;</button>
+    </div>
+
+    <div class="field">
+      <label>What needs to be done?</label>
+      <input id="f-title" placeholder="For example: Finish math homework">
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Day</label>
+        <select id="f-day">
+          <option>Monday</option>
+          <option>Tuesday</option>
+          <option>Wednesday</option>
+          <option>Thursday</option>
+          <option>Friday</option>
+          <option>Saturday</option>
+          <option>Sunday</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Time — 24-hour format</label>
+        <select id="f-time"></select>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label>Who does it?</label>
+        <input id="f-who" placeholder="Your name">
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+        <select id="f-status">
+          <option>To do</option>
+          <option>In progress</option>
+          <option>Done</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Notes</label>
+      <textarea id="f-notes" rows="3" placeholder="Add details or instructions"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------
+// SHARED MODE — Supabase
+// ---------------------------------------------------------
+const SUPABASE_URL = "https://liqdrpakirlysbzlohny.supabase.co/rest/v1/";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6NvzhI-6KXgvBmO8ndMvsg_3lY0JC3R";
+const SUPABASE_TABLE_URL = SUPABASE_URL + "planner_tasks";
+
+async function supabaseRequest(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Shared planner error (${response.status}): ${detail}`);
+  }
+  if (response.status === 204) return null;
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+const LOCAL_KEY = 'weekly-planner-local-v1';
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const TIMES = [];
+
+for (let hour = 0; hour < 24; hour++) {
+  TIMES.push(String(hour).padStart(2, '0') + ':00');
+  TIMES.push(String(hour).padStart(2, '0') + ':30');
+}
+
+let mode = 'offline';
+let localTasks = [];
+let sharedTasks = {};
+let tasksRef = null;
+let editingId = null;
+let selectedDay = 'Monday';
+let selectedTime = '08:00';
+
+let memoryStorage = {};
+
+function safeGet(key) {
+  try { return localStorage.getItem(key); }
+  catch { return memoryStorage[key] || null; }
+}
+
+function safeSet(key, value) {
+  try { localStorage.setItem(key, value); }
+  catch { memoryStorage[key] = value; }
+}
+
+async function setMode(newMode) {
+  mode = newMode;
+  document.getElementById('offlineBtn').classList.toggle('active', mode === 'offline');
+  document.getElementById('sharedBtn').classList.toggle('active', mode === 'shared');
+  if (mode === 'offline') {
+    document.getElementById('modeTitle').textContent = 'Offline mode';
+    document.getElementById('modeText').textContent =
+      'Tasks are saved only on this device. Other people cannot edit them.';
+    render();
+    return;
+  }
+  document.getElementById('modeTitle').textContent = 'Connecting…';
+  document.getElementById('modeText').textContent = 'Loading shared tasks…';
+  try {
+    await refreshSharedTasks();
+    document.getElementById('modeTitle').textContent = 'Shared mode';
+    document.getElementById('modeText').textContent =
+      'Everyone with access to this planner can see and edit the same tasks.';
+  } catch (error) {
+    document.getElementById('modeTitle').textContent = 'Shared mode unavailable';
+    document.getElementById('modeText').textContent = error.message;
+    alert('Could not connect to the shared planner.\\n\\n' + error.message +
+      '\\n\\nCheck that the Supabase table and access policies have been created.');
+  }
+  render();
+}
+
+function load() {
+  const saved = safeGet(LOCAL_KEY);
+  if (saved) {
+    try { localTasks = JSON.parse(saved) || []; }
+    catch { localTasks = []; }
+  }
+  render();
+}
+
+async function refreshSharedTasks() {
+  const rows = await supabaseRequest(SUPABASE_TABLE_URL + '?select=*&order=updatedAt.asc');
+  sharedTasks = {};
+  (rows || []).forEach(task => { sharedTasks[task.id] = task; });
+  if (mode === 'shared') render();
+}
+
+setInterval(() => {
+  if (mode === 'shared') {
+    refreshSharedTasks().catch(error => {
+      document.getElementById('modeText').textContent = error.message;
+    });
+  }
+}, 4000);
+
+function saveLocal() {
+  safeSet(LOCAL_KEY, JSON.stringify(localTasks));
+}
+
+function getAllTasks() {
+  if (mode === 'shared') {
+    return Object.values(sharedTasks || {});
+  }
+
+  return localTasks;
+}
+
+function render() {
+  const allTasks = getAllTasks();
+  const todayName = DAYS[(new Date().getDay() + 6) % 7];
+
+  document.getElementById('week').innerHTML = DAYS.map(day => {
+    const dayTasks = allTasks
+      .filter(task => task.day === day)
+      .sort((a, b) => a.time.localeCompare(b.time));
+
+    return `
+      <section class="day ${day === todayName ? 'today' : ''}">
+        <div class="day-head">
+          <span class="day-name">${day}</span>
+          <span class="day-count">${dayTasks.length}</span>
+        </div>
+
+        ${TIMES.map(time => {
+          const task = dayTasks.find(item => item.time === time);
+
+          if (!task) {
+            return `
+              <div class="slot" onclick="openModalFor('${day}', '${time}')">
+                <div class="slot-time">${time}</div>
+                <div>+ Add task</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="slot filled">
+              <div class="slot-time">${time}</div>
+              <div class="slot-title">${escapeHtml(task.title)}</div>
+              <div class="slot-owner">
+                ${task.who ? '👤 ' + escapeHtml(task.who) : ''}
+                ${task.status ? ' • ' + escapeHtml(task.status) : ''}
+              </div>
+
+              <div class="task-actions">
+                <button class="mini" onclick="editTask('${task.id}')">Edit</button>
+                <button class="mini danger" onclick="deleteTask('${task.id}')">Delete</button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </section>
+    `;
+  }).join('');
+}
+
+function openModalFor(day, time) {
+  selectedDay = day;
+  selectedTime = time;
+  openModal();
+}
+
+function openModal(task) {
+  editingId = task ? task.id : null;
+
+  document.getElementById('modalTitle').textContent = task ? 'Edit task' : 'New task';
+  document.getElementById('f-title').value = task?.title || '';
+  document.getElementById('f-day').value = task?.day || selectedDay;
+  document.getElementById('f-time').value = task?.time || selectedTime;
+  document.getElementById('f-who').value = task?.who || '';
+  document.getElementById('f-notes').value = task?.notes || '';
+  document.getElementById('f-status').value = task?.status || 'To do';
+
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('f-title').focus();
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+  editingId = null;
+}
+
+function useIdea(title) {
+  document.getElementById('f-title').value = title;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('f-title').focus();
+}
+
+async function saveTask() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) {
+    alert('Please enter what needs to be done.');
+    return;
+  }
+  const task = {
+    title,
+    day: document.getElementById('f-day').value,
+    time: document.getElementById('f-time').value,
+    who: document.getElementById('f-who').value,
+    notes: document.getElementById('f-notes').value,
+    status: document.getElementById('f-status').value,
+    updatedAt: Date.now()
+  };
+
+  if (mode === 'shared') {
+    try {
+      if (editingId) {
+        await supabaseRequest(SUPABASE_TABLE_URL + '?id=eq.' + encodeURIComponent(editingId), {
+          method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(task)
+        });
+      } else {
+        task.id = (crypto.randomUUID ? crypto.randomUUID() : 'task-' + Date.now());
+        await supabaseRequest(SUPABASE_TABLE_URL, {
+          method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(task)
+        });
+      }
+      await refreshSharedTasks();
+      closeModal();
+    } catch (error) {
+      alert('Could not save the shared task.\\n\\n' + error.message);
+    }
+  } else {
+    if (editingId) {
+      const index = localTasks.findIndex(item => item.id === editingId);
+      if (index >= 0) localTasks[index] = { ...task, id: editingId };
+    } else {
+      localTasks.push({ ...task, id: 'task-' + Date.now() });
+    }
+    saveLocal();
+    render();
+    closeModal();
+  }
+}
+
+function editTask(id) {
+  const task = getAllTasks().find(item => item.id === id);
+  if (task) openModal({ ...task, id });
+}
+
+async function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  if (mode === 'shared') {
+    try {
+      await supabaseRequest(SUPABASE_TABLE_URL + '?id=eq.' + encodeURIComponent(id), {
+        method: 'DELETE', headers: { Prefer: 'return=minimal' }
+      });
+      await refreshSharedTasks();
+    } catch (error) {
+      alert('Could not delete the shared task.\\n\\n' + error.message);
+    }
+  } else {
+    localTasks = localTasks.filter(task => task.id !== id);
+    saveLocal();
+    render();
+  }
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+document.getElementById('f-time').innerHTML = TIMES
+  .map(time => `<option>${time}</option>`)
+  .join('');
+
+document.getElementById('overlay').addEventListener('click', event => {
+  if (event.target === event.currentTarget) closeModal();
+});
+
+load();
+</script>
+
+</body>
+</html>
